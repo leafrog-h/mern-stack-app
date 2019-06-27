@@ -1,3 +1,3 @@
 module.exports = {
-    mongoURI: "mongodb://localhost:27017/react-express"
+    mongoURI: "mongodb://localhost:27017/mern-stack-project"
 };

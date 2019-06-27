@@ -70,7 +70,7 @@ class LoginComponent extends React.Component {
     const {serverError, ...userInfo} = this.state
     axios.post('http:/localhost:8080/finduser', userInfo)
     .then(res => this.setState({serviceInfo: res.date}))
-    .then(res => this.props.history.push('/dashboard/' + res.date.objectId))
+    .then(res => this.props.history.push('/dashboard/' + res.data._id))
   };
 
 }

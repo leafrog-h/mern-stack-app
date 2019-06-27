@@ -15,8 +15,11 @@ app.listen(port, () => {
 })
 
 const addUser = require('./routes/api/adduser')
-const fetchUser = require('./routes/api/fetchuser')
 const findUser = require('./routes/api.finduser')
-app.use('/adduser', addUser);
-app.use('/fetchuser', fetchUser)
-app.use('/finduser', findUser)
+const createExercise = require('./routes/api/creat_exercise')
+const exerciseList = require('./routes/api/exercise_list')
+
+app.use('/', addUser);
+app.use('/dashboard/create/:id', createExercise)
+app.use('./dashboard/exercise_list/:id', exerciseList)
+app.use('/', findUser)

@@ -109,7 +109,7 @@ class SignupComponent extends React.Component {
     const dataToSubmit = Object.assign(rest, {date: Date.now})
     axios.post('http:/localhost:8080/adduser', dataToSubmit)
     .then(res => console.log(res.data))
-    .then(res => this.props.history.push('/dashboard/' + res.data.objectId)
+    .then(res => this.props.history.push('/dashboard/' + res.data._id)
   )
   }
 }  

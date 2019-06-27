@@ -1,12 +1,12 @@
 const express = require('express')
 const router = express.router()
-const User = require('../../userschema')
+const Exercise = require('../../models/exerciseschema')
 
-router.get('/user/:id', async (req, res) => {
+router.get('/exercise_list/:id', async (req, res) => {
     const userId = req.params.id;
     try {
-        const user = await User.findById(userId)
-        res.status(201).json(user)
+        const exerciseList = await Exercise.find({userId})
+        res.status(201).json(exerciseList)
     } catch (err) {
         res.status(500).json('cannot find user')
     }
