@@ -78,7 +78,7 @@ export default function Dashboard(props) {
           variant="outlined"
           onChange={e => setDuration(e.target.value)}
         />
-        <Button variant="contained" className={classes.button}>
+        <Button variant="contained" type="submit" className={classes.button}>
           Submit
         </Button>
       </FormGroup>
