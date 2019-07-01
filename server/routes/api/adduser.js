@@ -1,6 +1,6 @@
-const express = require("express");
+const express = require("../../../../../../AppData/Local/Microsoft/TypeScript/2.9/node_modules/@types/express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("../../../../../../AppData/Local/Microsoft/TypeScript/2.9/node_modules/@types/bcrypt");
 
 const User = require("../../models/user_schema");
 
@@ -8,7 +8,7 @@ const User = require("../../models/user_schema");
 router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
   const isEmailTaken = await User.find(email);
-  if (isEmailTaken) res.status(400).json({ isEmailTaken: true });
+  if (isEmailTaken) res.status(400).json({ isEmailTaken: true }); // client error
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedpwd = await bcrypt.hash(password, salt);
@@ -16,7 +16,8 @@ router.post("/signup", async (req, res) => {
     await createdUser.save();
     res.status(201).json(createdUser);
   } catch (error) {
-    res.status(500).json("fail to add a user");
+    console.error(error);
+    res.status(500).json({ serverError: "fail to add a user" }); // server error
   }
 });
 module.exports = router;
