@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "../../../../../../AppData/Local/Microsoft/TypeScript/2.9/node_modules/@types/react-router-dom";
 import React from "react";
 import styles from "./styles";
 import FormControl from "@material-ui/core/FormControl";
@@ -18,7 +18,8 @@ class LoginComponent extends React.Component {
       email: null,
       password: null,
       isPwdCorrect: true,
-      errorMessage: ""
+      errorMessage: "",
+      serverError: null
     };
   }
 
@@ -31,15 +32,17 @@ class LoginComponent extends React.Component {
     });
 
   isUserValid = () => {
-    const { errorMessage, isPwdCorrect } = this.state;
-    return errorMessage === "" && isPwdCorrect === true ? true : false;
+    const { errorMessage, isPwdCorrect, serverError } = this.state;
+    return !!errorMessage && isPwdCorrect === true && !serverError
+      ? true
+      : false; // primary data type convertion
   };
   submitLogin = e => {
     e.preventDefault();
     const { serverError, ...userInfo } = this.state;
     axios
       .post("http:/localhost:8080/finduser", userInfo)
-      .then(res => {
+      /*     .then(res => {
         if (res.data.isPwdCorrect === false)
           this.setState({ isPwdCorrect: false });
         if (res.data.errorMessage)
@@ -50,6 +53,22 @@ class LoginComponent extends React.Component {
         if (this.isUserValid())
           this.props.history.push("/dashboard/" + res.data._id);
         this.clearInput();
+      });          */
+      .then(res => {
+        if (this.isUserValid())
+          this.props.history.push("/dashboard/" + res.data._id);
+        this.clearInput();
+      })
+      .catch(err => {
+        if (err.response.status === 400) {
+          const { errorMessage, isPwdCorrect } = err.response.data;
+          if (!!errorMessage) this.setState({ errorMessage });
+          if (!!isPwdCorrect) this.setState({ isPwdCorrect });
+        } else {
+          // error from server
+          const { serverError } = err.response.data;
+          this.setState({ serverError });
+        }
       });
   };
 
@@ -95,6 +114,15 @@ class LoginComponent extends React.Component {
                 id="login-password-input"
               />
             </FormControl>
+            {!this.state.isPwdCorrect ? (
+              <Typography
+                className={classes.errorText}
+                component="h5"
+                variant="h6"
+              >
+                Incorrect Password
+              </Typography>
+            ) : null}
             <Button
               type="submit"
               fullWidth
@@ -105,13 +133,13 @@ class LoginComponent extends React.Component {
               Log In
             </Button>
           </form>
-          {!this.state.isPwdCorrect ? (
+          {this.state.errorMessage ? (
             <Typography
               className={classes.errorText}
               component="h5"
               variant="h6"
             >
-              Incorrect Password
+              {this.state.errorMessage}
             </Typography>
           ) : null}
           <h5 className={classes.noAccountHeader}>Don't Have An Account?</h5>

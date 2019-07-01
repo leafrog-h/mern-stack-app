@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "../../../../../../AppData/Local/Microsoft/TypeScript/2.9/node_modules/@types/react-router-dom";
 import React from "react";
 import styles from "./styles";
 import FormControl from "@material-ui/core/FormControl";
@@ -23,7 +23,8 @@ class SignupComponent extends React.Component {
       signupError: {
         isPasswordConfirmed: false,
         errorMessage: "",
-        isEmailTaken: false
+        isEmailTaken: false,
+        serverError: null
       }
     };
   }
@@ -46,7 +47,8 @@ class SignupComponent extends React.Component {
     return pwd === confirmPwd ? true : false;
   };
 
-  validateUserInfo = () => {
+  validateUserInput = () => {
+    // valid email and pwd length
     const schema = {
       email: joi
         .string()
@@ -61,37 +63,44 @@ class SignupComponent extends React.Component {
     const {
       userInfo: { passwordConfirmation, ...userInfoToValidate }
     } = this.state; // pull out the obj from state that contains email and password property only, to be validtaed later
-    const { errorMessage } = joi.validate(userInfoToValidate, schema); // errorMessage could be translated to Chinese
+    const { errorMessage } = joi.validate(userInfoToValidate, schema) || ""; // errorMessage could be translated to Chinese
     this.setState({
       signupError: {
         ...this.state.signupError,
-        errorMessage: !!errorMessage ? errorMessage : ""
+        errorMessage
       }
     });
-    return !errorMessage ? true : false;
   };
 
   isValidUser = () => {
+    // overall validation
     const {
-      userInfo: { errorMessage, isPasswordConfirmed, isEmailTaken }
+      signupError: {
+        isPasswordConfirmed,
+        errorMessage,
+        isEmailTaken,
+        serverError
+      }
     } = this.state;
-    return errorMessage === "" &&
+    return !errorMessage &&
       isPasswordConfirmed === true &&
-      isEmailTaken === false
+      !isEmailTaken &&
+      !serverError
       ? true
       : false;
   };
 
   submitSignup = e => {
+    // user info onsubmit function
     e.preventDefault(); // This is to prevent the automatic refreshing of the page on submit.
     this.confirmPassword();
-    this.validateUserInfo();
+    this.validateUserInput();
     const {
-      userInfo: { passwordConfirmation, ...dataToSubmit }
+      userInfo: { passwordConfirmation, ...dataToSubmit } //only submit {email, pwd} to server
     } = this.state;
     axios
       .post("http:/localhost:8080/adduser", dataToSubmit)
-      .then(res => {
+      /*   .then(res => {
         if (res.data.isEmailTaken)
           this.setState({
             userInfo: { ...this.state.userInfo, isEmailTaken: true }
@@ -100,6 +109,24 @@ class SignupComponent extends React.Component {
       .then(res => {
         if (this.isValidUser())
           this.props.history.push("/dashboard" + res.data._id);
+      });           */
+      .then(res => {
+        if (this.isValidUser())
+          this.props.history.push("/dashboard" + res.data._id); // _id fetched from mongoose
+      })
+      .catch(err => {
+        if (err.response.status === 400) {
+          // clinet error
+          const { isEmailTaken } = err.response.data || false;
+          this.setState({
+            signupError: { ...this.state.signupError, isEmailTaken }
+          });
+        } else {
+          const { serverError } = err.response.data || null; // server error
+          this.setState({
+            signupError: { ...this.state.signupError, serverError }
+          });
+        }
       });
   };
 
@@ -126,6 +153,15 @@ class SignupComponent extends React.Component {
                 id="signup-email-input"
               />
             </FormControl>
+            {this.state.signupError.isEmailTaken ? null : (
+              <Typography
+                className={classes.errorText}
+                component="h5"
+                variant="h6"
+              >
+                Email has already been taken.
+              </Typography>
+            )}
             <FormControl required fullWidth margin="normal">
               <InputLabel htmlFor="signup-password-input">
                 Create A Password
@@ -154,7 +190,7 @@ class SignupComponent extends React.Component {
                 component="h5"
                 variant="h6"
               >
-                Passwords do not match
+                Please reconfirm your password.
               </Typography>
             )}
             <Button
@@ -180,6 +216,15 @@ class SignupComponent extends React.Component {
           <Link className={classes.logInLink} to="/login">
             Log In!
           </Link>
+          {!this.state.signupError.serverError ? null : (
+            <Typography
+              className={classes.errorText}
+              component="h5"
+              variant="h6"
+            >
+              {this.state.signupError.serverError}
+            </Typography>
+          )}
         </Paper>
       </main>
     );

@@ -5,7 +5,7 @@ const bcrypt = require("../../../../../../AppData/Local/Microsoft/TypeScript/2.9
 const User = require("../../models/user_schema");
 
 // for login validation
-router.post("/signup", async (req, res) => {
+router.post("/", async (req, res) => {
   const { email, password } = req.body;
   const isEmailTaken = await User.find(email);
   if (isEmailTaken) res.status(400).json({ isEmailTaken: true }); // client error
