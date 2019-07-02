@@ -42,7 +42,7 @@ export default function Dashboard(props) {
       exerciseKey: uuid.v4()
     };
     axios
-      .post("http:/localhost:8080/" + userId + "/create", exerciseInfo)
+      .post("http:/localhost:8080/create/" + userId, exerciseInfo)
       .then(res => this.props.history.push("/exercise_list/" + userId));
   };
   return (
@@ -78,7 +78,7 @@ export default function Dashboard(props) {
           variant="outlined"
           onChange={e => setDuration(e.target.value)}
         />
-        <Button variant="contained" className={classes.button}>
+        <Button variant="contained" type="submit" className={classes.button}>
           Submit
         </Button>
       </FormGroup>
