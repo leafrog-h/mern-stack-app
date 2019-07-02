@@ -5,6 +5,7 @@ import Paper from "@material-ui/core/Paper";
 import Fab from "@material-ui/core/Fab";
 import Icon from "@material-ui/core/Icon";
 import DeleteIcon from "@material-ui/icons/Delete";
+import axios from "axios";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -25,12 +26,23 @@ const useStyles = makeStyles(theme => ({
 
 export default function SingleExercise(props) {
   const classes = useStyles();
-  const { exercise, description, duration, userId } = props.exercise;
+  const {
+    exercise,
+    description,
+    duration,
+    userId,
+    exerciseKey
+  } = props.exercise;
   const handleEdit = () => {
-    props.history.push("/exercise_list/edit_exercise/" + userId);
+    props.history.push(
+      "/exercise_list/edit_exercise/" + userId + "/" + exerciseKey
+    ); //useing template literal is way better
   };
   const handleDelete = () => {
-    props.history.push("exercise_list/delete_exercise/" + userId);
+    axios.delete(
+      `http:/localhost:8080/dashboard/${userId}/delete/${exerciseKey}`
+    );
+    props.history.push("dashboard/exercise_list/" + userId);
   };
   return (
     <div>

@@ -7,7 +7,6 @@ import HomePage from "./Components/homepage";
 import Dashboard from "/Components/User_Exercise/dashboard";
 import ExerciseList from "/Components/User_Exercise/exercise_list";
 import EditExercise from "/Components/User_Exercise/exercise_edit";
-import DeleteExercise from "/Components/User_Exercise/exercise_delete";
 
 const App = () => {
   return (
@@ -20,12 +19,8 @@ const App = () => {
           <Route path="/dashboard/create_exercise/:id" component={Dashboard} />
           <Route path="/dashboard/exercise_list/:id" component={ExerciseList} />
           <Route
-            path="/dashboard/exercise_list/edit_exercise/:id/:exerciseKey"
+            path="/dashboard/exercise_list/:id/edit_exercise/:exerciseKey"
             component={EditExercise}
-          />
-          <Route
-            path="/dashboard/exercise_list/delete_exercise/:id"
-            component={DeleteExercise}
           />
         </Switch>
       </div>
