@@ -8,7 +8,7 @@ router.get("/:exerciseKey", async (req, res) => {
     const exerciseToEdit = await ExerCise.find({ exerciseKey });
     res.status(201).json(exerciseToEdit);
   } catch (err) {
-    res.status(500).json({ meg: "fail to edit an exercise" });
+    res.status(500).json({ msg: "fail to edit an exercise" });
   }
 });
 
